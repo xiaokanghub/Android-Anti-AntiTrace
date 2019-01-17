@@ -1,6 +1,36 @@
 # Android-Anti-AntiTrace
 ```javascript
 // int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
+var p_pthread_create = Module.findExportByName("libc.so","pthread_create");
+Interceptor.attach(ptr(p_pthread_create), {
+    onEnter: function (args) {
+        this.thread        = args[0];
+        this.attr          = args[1];
+        this.start_routine = args[2];
+        this.arg           = args[3];
+        this.fakeRet       = Boolean(0);
+        send("onEnter() pthread_create(" + this.thread.toString() + ", " + this.attr.toString() + ", "
+            + this.start_routine.toString() + ", " + this.arg.toString() + ");");
+ 
+        if (parseInt(this.attr) == 0 && parseInt(this.arg) == 0)
+            this.fakeRet = Boolean(1);
+ 
+    },
+    onLeave: function (retval) {
+        send(retval);
+        send("onLeave() pthread_create");
+        if (this.fakeRet == 1) {
+            var fakeRet = ptr(0);
+            send("pthread_create real ret: " + retval);
+            send("pthread_create fake ret: " + fakeRet);
+            return fakeRet;
+        }
+        return retval;
+    }
+});
+```
+```javascript
+// int pthread_create(pthread_t *thread, const pthread_attr_t *attr, void *(*start_routine) (void *), void *arg);
 var p_pthread_create = Module.findExportByName("libc.so", "pthread_create");
 var pthread_create = new NativeFunction( p_pthread_create, "int", ["pointer", "pointer", "pointer", "pointer"]);
 send("NativeFunction pthread_create() replaced @ " + pthread_create);
