@@ -45,9 +45,29 @@ Interceptor.replace( p_pthread_create, new NativeCallback(function (ptr0, ptr1, 
         ret = pthread_create(ptr0,ptr1,ptr2,ptr3);
     }
  
-    do_native_hooks_libfoo();
  
     send("ret: " + ret);
  
 }, "int", ["pointer", "pointer", "pointer", "pointer"]));
 ```
+```javascript
+long ptrace(enum __ptrace_request request, pid_t pid,void *addr, void *data);
+var p_ptrace = Module.findExportByName("libc.so", "ptrace");
+var ptrace = new NativeFunction( p_pthread_create, "int", ["int", "int", "pointer", "pointer"]);
+send("NativeFunction ptrace() replaced @ " + ptrace);
+ 
+Interceptor.replace( p_ptrace, new NativeCallback(function (ptr0, ptr1, ptr2, ptr3) {
+    send("p_ptrace() overloaded");
+    var ret = ptr(0);
+    if (ptr1.isNull() && ptr3.isNull()) {
+        send("loading fake ptrace because ptr1 and ptr3 are equal to 0!");
+    } else {
+        send("loading real ptrace()");
+        ret = ptrace(ptr0,ptr1,ptr2,ptr3);
+    }
+ 
+ 
+    send("ret: " + ret);
+ 
+}, "int", ["int", "int", "pointer", "pointer"]));
+
