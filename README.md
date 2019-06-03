@@ -80,7 +80,7 @@ Interceptor.replace(fgetsPtr, new NativeCallback(function (buffer, size, fp) {
     var bufstr = Memory.readUtf8String(buffer);
     if (bufstr.indexOf("TracerPid:") > -1) {
         Memory.writeUtf8String(buffer, "TracerPid:\t0");
-        // dmLogout("tracerpid replaced: " + Memory.readUtf8String(buffer));
+        
     }
     return retval;
 }, 'pointer', ['pointer', 'int', 'pointer']));
