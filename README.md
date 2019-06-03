@@ -72,7 +72,7 @@ Interceptor.replace( p_ptrace, new NativeCallback(function (ptr0, ptr1, ptr2, pt
 }, "int", ["int", "int", "pointer", "pointer"]));
 ```
 
-```javescript
+```javascript
 var fgetsPtr = Module.findExportByName("libc.so", "fgets");
 var fgets = new NativeFunction(fgetsPtr, 'pointer', ['pointer', 'int', 'pointer']);
 Interceptor.replace(fgetsPtr, new NativeCallback(function (buffer, size, fp) {
